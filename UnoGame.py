@@ -1,23 +1,23 @@
 from player import Player
 
-class UnoModel:
-    def __init__(self, player):
-        #self.board
-        self.__player = Player.ONE
+
+class UnoGame:
+    def __init__(self, players):
+        # self.board
+        self.__players = players
+        self.__deck = []
+        self.__current_color = None
+        self.__current_player_index = 0
+        self.__direction = 1
         self.__message_code = None
 
-    #def valid_move(self, ):
-
-
-    #def move(self, ):
-
     @property
-    def current_player(self):
-        return self.__player
+    def players(self):
+        return self.__players
 
-    @current_player.setter
-    def current_player(self, new):
-        self.__player = new
+    @players.setter
+    def players(self, new):
+        self.__players = new
 
     @property
     def messageCode(self):
@@ -26,9 +26,43 @@ class UnoModel:
     @messageCode.setter
     def messageCode(self, mes):
         self.__message_code = mes
-    def set_next_player(self):
-        if self.current_player == Player.ONE:
-            self.__player = Player.TWO
-        elif self.current_player == Player.TWO:
-            self.__player = Player.ONE
+
+    @property
+    def deck(self):
+        return self.__deck
+
+    @deck.setter
+    def deck(self, newdeck):
+        self.__deck = newdeck
+
+    @property
+    def current_color(self):
+        return self.__current_color
+
+    @current_color.setter
+    def current_color(self, newcurrent_color):
+        self.__current_color = newcurrent_color
+
+    @property
+    def current_player_index(self):
+        return self.__current_player_index
+
+    @current_player_index.setter
+    def current_player_index(self, newcurrent_player_index):
+        self.__current_player_index = newcurrent_player_index
+
+    @property
+    def direction(self):
+        return self.__direction
+
+    @direction.setter
+    def direction(self, newdirection):
+        self.__direction = newdirection
+
+
+    #def create_deck(self):
+        colors = ["red", "blue", "green", "yellow"]
+        deck = []
+
+
 

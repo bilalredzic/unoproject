@@ -7,6 +7,7 @@ class CardType(Enum):
     ACTION = 1
     WILD = 2
 
+
 class Color(Enum):
     RED = 'red'
     BLUE = 'blue'
@@ -44,3 +45,8 @@ class UnoCard:
     @type.setter
     def type(self, newtype):
         self.__type = newtype
+
+
+class ColorCard(UnoCard):
+    def __init__(self, color, value, card_type):
+        super().__init__(color, value, card_type)
