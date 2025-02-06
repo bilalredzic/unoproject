@@ -69,7 +69,7 @@ class UnoGame:
         deck = []
         for color in colors:
             deck.append(UnoCard(color, 0, CardType))
-            for value in range(1, 10):
+            for value in values:
                 deck.append(UnoCard(color, value, CardType.NORMAL))
                 deck.append(UnoCard(color, value, CardType.NORMAL))
 
@@ -103,6 +103,15 @@ class UnoGame:
                 break
             else:
                 self.deck.append(first_card)
+
+    def next_turn(self):
+
+
+    def uno_end(self):
+
+
+
+
 
 
 
