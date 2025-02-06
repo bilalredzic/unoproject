@@ -1,5 +1,6 @@
 from player import Player
-
+from card import Color, UnoCard, CardType
+import random
 
 class UnoGame:
     def __init__(self, players):
@@ -60,9 +61,48 @@ class UnoGame:
         self.__direction = newdirection
 
 
-    #def create_deck(self):
-        colors = ["red", "blue", "green", "yellow"]
+    def create_deck(self):
+        colors = [Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW]
+        values = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        action_cards = ["skip", "reverse", "draw_two"]
+        wild_cards = ["wild", "draw_four"]
         deck = []
+        for color in colors:
+            deck.append(UnoCard(color, 0, CardType))
+            for value in range(1, 10):
+                deck.append(UnoCard(color, value, CardType.NORMAL))
+                deck.append(UnoCard(color, value, CardType.NORMAL))
+
+        for color in colors:
+            for action in action_cards:
+                deck.append(UnoCard(color, action, CardType.ACTION))
+                deck.append(UnoCard(color, action, CardType.ACTION))
+
+        for wild in wild_cards:
+            for i in range (4):
+                deck.append(UnoCard(Color.WILD, wild, CardType.WILD))
+
+        self.deck = deck
+
+    def shuffle_deck(self):
+        random.shuffle(self.__deck)
+
+    def deal_cards(self):
+        self.shuffle_deck()
+        for player in self.players:
+            player.hand = []
+            for i in range(7):
+                player.hand.append(self.deck.pop())
+
+    def start_game(self):
+        self.deal_cards()
+        while True:
+            first_card = self.deck.pop()
+            if first_card.type == CardType.NORMAL:
+                self.current_color = first_card.color
+                break
+            else:
+                self.deck.append(first_card)
 
 
 
