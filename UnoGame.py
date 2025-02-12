@@ -105,9 +105,75 @@ class UnoGame:
                 self.deck.append(first_card)
 
     def next_turn(self):
+        self.current_player_index = (self.current_player_index + self.direction) % len(self.players)
+        for player in self.players:
+            player.is_turn = False
+        self.players[self.current_player_index].is_turn = True
 
+    def play_card(self, player, card):
+        if card.color == self.__current_color or card.value == self.__deck[-1].value or card.color == Color.WILD:
+            player.hand.remove(card)
+            self.__deck.append(card)
+            print(f"{player.name} played {card.color.value} {card.value}")
 
-    def uno_end(self):
+            if card.color == Color.WILD:
+                self.choose_color()
+            else:
+                self.__current_color = card.color
+
+            if card.value == "skip":
+                self.skip_player()
+            elif card.value == "reverse":
+                self.reverse_direction()
+            elif card.value == "draw_two":
+                self.draw_two()
+            elif card.value == "wild_draw_four":
+                self.draw_four()
+            else:
+                self.next_turn()
+        else:
+            print("Invalid move")
+
+    def choose_color(self):
+        valid_colors = [Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW]
+
+        chosen_color = input("Choose a color (red, blue, green, yellow): ").strip().lower()
+
+        if chosen_color in [color.value for color in valid_colors]:
+            self.__current_color = Color(chosen_color)
+            print(f"Color changed to {self.__current_color.value.upper()}")
+        else:
+            print("Invalid color")
+            self.choose_color()
+    def skip_player(self):
+        print(f"skipped")
+        self.next_turn()
+
+    def reverse_direction(self):
+        self.direction *= -1
+        print("reversed")
+
+        if len(self.players) == 2:
+            self.next_turn()
+
+    def draw_two(self):
+        next_player_index = (self.current_player_index + self.direction) % len(self.players)
+        for i in range (2):
+            if self.deck:
+                self.players[next_player_index].hand.append(self.deck.pop())
+        print(f"drew 2")
+        self.next_turn()
+
+    def draw_four(self):
+        next_player_index = (self.current_player_index + self.direction) % len(self.players)
+        for i in range(4):
+            if self.deck:
+                self.players[next_player_index].hand.append(self.deck.pop())
+        print(f"drew 4")
+        self.choose_color()
+        self.next_turn()
+
+    #def uno_end(self):
 
 
 
