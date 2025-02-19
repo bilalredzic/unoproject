@@ -68,7 +68,7 @@ class UnoGame:
         wild_cards = ["wild", "draw_four"]
         deck = []
         for color in colors:
-            deck.append(UnoCard(color, 0, CardType))
+            deck.append(UnoCard(color, 0, CardType.NORMAL))
             for value in values:
                 deck.append(UnoCard(color, value, CardType.NORMAL))
                 deck.append(UnoCard(color, value, CardType.NORMAL))
