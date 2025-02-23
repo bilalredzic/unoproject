@@ -33,34 +33,34 @@ class UnoGame:
         return self.__deck
 
     @deck.setter
-    def deck(self, newdeck):
-        self.__deck = newdeck
+    def deck(self, new_deck):
+        self.__deck = new_deck
 
     @property
     def current_color(self):
         return self.__current_color
 
     @current_color.setter
-    def current_color(self, newcurrent_color):
-        self.__current_color = newcurrent_color
+    def current_color(self, new_current_color):
+        self.__current_color = new_current_color
 
     @property
     def current_player_index(self):
         return self.__current_player_index
 
     @current_player_index.setter
-    def current_player_index(self, newcurrent_player_index):
-        self.__current_player_index = newcurrent_player_index
+    def current_player_index(self, new_current_player_index):
+        self.__current_player_index = new_current_player_index
 
     @property
     def direction(self):
         return self.__direction
 
     @direction.setter
-    def direction(self, newdirection):
-        self.__direction = newdirection
+    def direction(self, new_direction):
+        self.__direction = new_direction
 
-
+    # Creates the deck that the players will be drawing from
     def create_deck(self):
         colors = [Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW]
         values = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -68,7 +68,7 @@ class UnoGame:
         wild_cards = ["wild", "draw_four"]
         deck = []
         for color in colors:
-            deck.append(UnoCard(color, 0, CardType.NORMAL))
+            deck.append(UnoCard(color, 0, CardType.NORMAL)) #Are we adding an extra 4 zeros when we should be having 4 less zeros? 0 is included in our values list.
             for value in values:
                 deck.append(UnoCard(color, value, CardType.NORMAL))
                 deck.append(UnoCard(color, value, CardType.NORMAL))
@@ -87,6 +87,7 @@ class UnoGame:
     def shuffle_deck(self):
         random.shuffle(self.__deck)
 
+    # Deals each player 7 random cards
     def deal_cards(self):
         self.shuffle_deck()
         for player in self.players:
@@ -94,6 +95,7 @@ class UnoGame:
             for i in range(7):
                 player.hand.append(self.deck.pop())
 
+    # Puts the first card on the table
     def start_game(self):
         self.deal_cards()
         while True:
@@ -110,6 +112,7 @@ class UnoGame:
             player.is_turn = False
         self.players[self.current_player_index].is_turn = True
 
+    # Checks if played card is valid and reacts if it's an action or wild card
     def play_card(self, player, card):
         if card.color == self.__current_color or card.value == self.__deck[-1].value or card.color == Color.WILD:
             player.hand.remove(card)
@@ -134,6 +137,7 @@ class UnoGame:
         else:
             print("Invalid move")
 
+    # Asks player to choose a color when a WILD is played
     def choose_color(self):
         valid_colors = [Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW]
 
@@ -145,6 +149,7 @@ class UnoGame:
         else:
             print("Invalid color")
             self.choose_color()
+
     def skip_player(self):
         print(f"skipped")
         self.next_turn()
@@ -156,6 +161,7 @@ class UnoGame:
         if len(self.players) == 2:
             self.next_turn()
 
+    # Makes the next player draw 2 cards
     def draw_two(self):
         next_player_index = (self.current_player_index + self.direction) % len(self.players)
         for i in range (2):
@@ -164,6 +170,7 @@ class UnoGame:
         print(f"drew 2")
         self.next_turn()
 
+    # Makes the next player draw 4 cards and the current player choose a color
     def draw_four(self):
         next_player_index = (self.current_player_index + self.direction) % len(self.players)
         for i in range(4):

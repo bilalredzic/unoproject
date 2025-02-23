@@ -27,24 +27,24 @@ class UnoCard:
         return self.__color
 
     @color.setter
-    def color(self, newcolor):
-        self.__color = newcolor
+    def color(self, new_color):
+        self.__color = new_color
 
     @property
     def value(self):
         return self.__value
 
     @value.setter
-    def value(self, newvalue):
-        self.__value = newvalue
+    def value(self, new_value):
+        self.__value = new_value
 
     @property
     def type(self):
         return self.__type
 
     @type.setter
-    def type(self, newtype):
-        self.__type = newtype
+    def type(self, new_type):
+        self.__type = new_type
 
 
 class ColorCard(UnoCard):

@@ -23,13 +23,13 @@ class Player:
         return self.__hand
 
     @hand.setter
-    def hand(self, newhand):
-        self.__hand = newhand
+    def hand(self, new_hand):
+        self.__hand = new_hand
 
     @property
     def is_turn(self):
         return self.__is_turn
 
     @is_turn.setter
-    def is_turn(self, newis_turn):
-        self.__is_turn = newis_turn
+    def is_turn(self, new_is_turn):
+        self.__is_turn = new_is_turn

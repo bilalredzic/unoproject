@@ -29,6 +29,7 @@ class UnoGUI:
         self.load_card_images()
 
     def _create_ui_elements(self):
+        # Creates the draw button
         self.draw_button = gui.elements.UIButton(
             relative_rect=pg.Rect((650, 500), (120, 40)),
             text='Draw',
@@ -43,6 +44,7 @@ class UnoGUI:
         #)
         #self.color_dropdown.hide()
 
+        # Creates the message box
         self.message_display = gui.elements.UITextBox(
             html_text="Welcome to Uno!<br>",
             relative_rect=pg.Rect((600, 10), (190, 380)),
