@@ -99,7 +99,7 @@ class UnoGame:
     def start_game(self):
         self.deal_cards()
         while True:
-            first_card = self.deck.pop()
+            first_card = self.deck.pop(random.randrange(len(self.deck)))
             if first_card.type == CardType.NORMAL:
                 self.current_color = first_card.color
                 break
