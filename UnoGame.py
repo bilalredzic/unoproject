@@ -2,6 +2,7 @@ from player import Player
 from card import Color, UnoCard, CardType
 import random
 
+
 class UnoGame:
     def __init__(self, players):
         # self.board
@@ -68,7 +69,7 @@ class UnoGame:
         wild_cards = ["wild", "draw_four"]
         deck = []
         for color in colors:
-            deck.append(UnoCard(color, 0, CardType.NORMAL)) #Are we adding an extra 4 zeros when we should be having 4 less zeros? 0 is included in our values list.
+            deck.append(UnoCard(color, 0, CardType.NORMAL))  # Are we adding an extra 4 zeros when we should be having 4 less zeros? 0 is included in our values list.
             for value in values:
                 deck.append(UnoCard(color, value, CardType.NORMAL))
                 deck.append(UnoCard(color, value, CardType.NORMAL))
@@ -79,38 +80,48 @@ class UnoGame:
                 deck.append(UnoCard(color, action, CardType.ACTION))
 
         for wild in wild_cards:
-            for i in range (4):
+            for i in range(4):
                 deck.append(UnoCard(Color.WILD, wild, CardType.WILD))
 
         self.deck = deck
+    print("Deck Created!")  # delete when testing is finished
+    print(deck)  # delete when testing is finished
 
     def shuffle_deck(self):
         random.shuffle(self.__deck)
+        print("Shuffled Deck")  # delete when testing is finished
+        print(self.deck)  # delete when testing is finished
 
     # Deals each player 7 random cards
     def deal_cards(self):
         self.shuffle_deck()
         for player in self.players:
+            print(f"{player.name} is drawing cards")  # delete when testing is finished
             player.hand = []
             for i in range(7):
                 player.hand.append(self.deck.pop())
+                print(f"{player.hand}")  # delete when testing is finished
 
     # Puts the first card on the table
     def start_game(self):
         self.deal_cards()
         while True:
             first_card = self.deck.pop(random.randrange(len(self.deck)))
+            print(first_card)  # delete when testing is finished
             if first_card.type == CardType.NORMAL:
                 self.current_color = first_card.color
+                print("Success!")  # delete when testing is finished
                 break
             else:
                 self.deck.append(first_card)
+                print("Retry")  # delete when testing is finished
 
     def next_turn(self):
         self.current_player_index = (self.current_player_index + self.direction) % len(self.players)
         for player in self.players:
             player.is_turn = False
         self.players[self.current_player_index].is_turn = True
+        print(f"It Is Now: {self.players[self.current_player_index]} Turn")
 
     # Checks if played card is valid and reacts if it's an action or wild card
     def play_card(self, player, card):
@@ -140,23 +151,23 @@ class UnoGame:
     # Asks player to choose a color when a WILD is played
     def choose_color(self):
         valid_colors = [Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW]
-
         chosen_color = input("Choose a color (red, blue, green, yellow): ").strip().lower()
-
         if chosen_color in [color.value for color in valid_colors]:
             self.__current_color = Color(chosen_color)
             print(f"Color changed to {self.__current_color.value.upper()}")
         else:
-            print("Invalid color")
+            print("Invalid color, try again")
             self.choose_color()
 
+# skips the next player
     def skip_player(self):
-        print(f"skipped")
+        next_player_index = (self.current_player_index + self.direction) % len(self.players)
+        print(f"Skipped {self.players[next_player_index].name}")
         self.next_turn()
 
     def reverse_direction(self):
         self.direction *= -1
-        print("reversed")
+        print("Direction Reversed")
 
         if len(self.players) == 2:
             self.next_turn()
@@ -164,10 +175,10 @@ class UnoGame:
     # Makes the next player draw 2 cards
     def draw_two(self):
         next_player_index = (self.current_player_index + self.direction) % len(self.players)
-        for i in range (2):
+        for i in range(2):
             if self.deck:
                 self.players[next_player_index].hand.append(self.deck.pop())
-        print(f"drew 2")
+        print(f"{self.players[next_player_index].name} Drew 2")
         self.next_turn()
 
     # Makes the next player draw 4 cards and the current player choose a color
@@ -176,15 +187,8 @@ class UnoGame:
         for i in range(4):
             if self.deck:
                 self.players[next_player_index].hand.append(self.deck.pop())
-        print(f"drew 4")
+        print(f"{self.players[next_player_index].name} Drew 4")
         self.choose_color()
         self.next_turn()
 
-    #def uno_end(self):
-
-
-
-
-
-
-
+    # def uno_end(self):
