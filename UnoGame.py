@@ -128,7 +128,6 @@ class UnoGame:
         if card.color == self.__current_color or card.value == self.__deck[-1].value or card.color == Color.WILD:
             player.hand.remove(card)
             self.__deck.append(card)
-            print(f"{player.name} played {card.color.value} {card.value}")
 
             if card.color == Color.WILD:
                 self.choose_color()

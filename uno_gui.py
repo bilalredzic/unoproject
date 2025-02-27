@@ -116,7 +116,10 @@ class UnoGUI:
             if card_index < len(current_player.hand):
                 selected_card = current_player.hand[card_index]
                 if self.game.play_card(current_player, selected_card) is not False:
-                    self._update_game_display(f"{current_player.name} played {selected_card.value}")
+                    if selected_card.value == "wild":
+                        self._update_game_display(f"{current_player.name} played a {selected_card.value}")
+                    else:
+                        self._update_game_display(f"{current_player.name} played a {selected_card.color.value} {selected_card.value}")
                 else:
                     self._update_game_display(f"{current_player.name} played an invalid move")
 
