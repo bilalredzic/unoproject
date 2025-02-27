@@ -141,12 +141,12 @@ class UnoGame:
                 self.reverse_direction()
             elif card.value == "draw_two":
                 self.draw_two()
-            elif card.value == "wild_draw_four":
+            elif card.value == "draw_four":
                 self.draw_four()
             else:
                 self.next_turn()
         else:
-            print("Invalid move")
+            return False
 
     # Asks player to choose a color when a WILD is played
     def choose_color(self):

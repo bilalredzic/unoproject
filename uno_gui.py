@@ -63,7 +63,7 @@ class UnoGUI:
                 scaled_image = pg.transform.scale(image, (CARD_WIDTH, CARD_HEIGHT))
                 self.card_images[(color, number)] = scaled_image
 
-            # Load action card images.
+            # Load action and wild card images.
             for action in action_values:
                 image_path = f"./images/{color}_{action}.png"
                 image = pg.image.load(image_path)
@@ -115,8 +115,10 @@ class UnoGUI:
 
             if card_index < len(current_player.hand):
                 selected_card = current_player.hand[card_index]
-                self.game.play_card(current_player, selected_card)
-                self._update_game_display(f"{current_player.name} played {selected_card.value}")
+                if self.game.play_card(current_player, selected_card) is not False:
+                    self._update_game_display(f"{current_player.name} played {selected_card.value}")
+                else:
+                    self._update_game_display(f"{current_player.name} played an invalid move")
 
                 #if selected_card.type == "WILD":
                     #self.color_dropdown.show()
