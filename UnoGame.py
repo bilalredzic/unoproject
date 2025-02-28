@@ -8,6 +8,7 @@ class UnoGame:
         # self.board
         self.__players = players
         self.__deck = []
+        self.__spent_deck = []
         self.__current_color = None
         self.__current_player_index = 0
         self.__direction = 1
@@ -36,6 +37,14 @@ class UnoGame:
     @deck.setter
     def deck(self, new_deck):
         self.__deck = new_deck
+
+    @property
+    def spent_deck(self):
+        return self.__spent_deck
+
+    @spent_deck.setter
+    def spent_deck(self, new_spent_deck):
+        self.__spent_deck = new_spent_deck
 
     @property
     def current_color(self):
@@ -89,8 +98,14 @@ class UnoGame:
 
     def shuffle_deck(self):
         random.shuffle(self.__deck)
-        print("Shuffled Deck")  # delete when testing is finished
-        print(self.deck)  # delete when testing is finished
+        print("Shuffled Deck: ", self.deck)  # delete when testing is finished
+
+    def shuffle_spent_deck(self):
+        random.shuffle(self.__spent_deck)
+        print("Reshuffled The Deck: ", self.spent_deck)
+        self.deck = self.spent_deck
+        self.spent_deck = []
+
 
     # Deals each player 7 random cards
     def deal_cards(self):
