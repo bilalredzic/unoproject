@@ -2,7 +2,6 @@ from player import Player
 from card import Color, UnoCard, CardType
 import random
 
-
 class UnoGame:
     def __init__(self, players):
         # self.board
@@ -92,18 +91,18 @@ class UnoGame:
             for i in range(4):
                 deck.append(UnoCard(Color.WILD, wild, CardType.WILD))
 
-        self.deck = deck
+        self.__deck = deck
         print("Deck Created!")  # delete when testing is finished
         print(deck)  # delete when testing is finished
 
     def shuffle_deck(self):
         random.shuffle(self.__deck)
-        print("Shuffled Deck: ", self.deck)  # delete when testing is finished
+        print("Shuffled Deck: ", self.__deck)  # delete when testing is finished
 
     def shuffle_spent_deck(self):
         random.shuffle(self.__spent_deck)
         print("Reshuffled The Deck: ", self.spent_deck)
-        self.deck = self.spent_deck
+        self.__deck = self.spent_deck
         self.spent_deck = []
 
 
@@ -113,20 +112,20 @@ class UnoGame:
         for player in self.players:
             player.hand = []
             for i in range(7):
-                player.hand.append(self.deck.pop())
+                player.hand.append(self.__deck.pop())
 
     # Puts the first card on the table
     def start_game(self):
         self.deal_cards()
         while True:
-            first_card = self.deck.pop(random.randrange(len(self.deck)))
+            first_card = self.__deck.pop(random.randrange(len(self.__deck)))
             print(first_card)  # delete when testing is finished
             if first_card.type == CardType.NORMAL:
                 self.current_color = first_card.color
                 print("Success: ", first_card)  # delete when testing is finished
                 break
             else:
-                self.deck.append(first_card)
+                self.__deck.append(first_card)
                 print("Retry")  # delete when testing is finished
 
     def next_turn(self):
@@ -188,8 +187,8 @@ class UnoGame:
     def draw_two(self):
         next_player_index = (self.current_player_index + self.direction) % len(self.players)
         for i in range(2):
-            if self.deck:
-                self.players[next_player_index].hand.append(self.deck.pop())
+            if self.__deck:
+                self.players[next_player_index].hand.append(self.__deck.pop())
         print(f"{self.players[next_player_index].name} Drew 2")
         self.next_turn()
 
@@ -197,8 +196,8 @@ class UnoGame:
     def draw_four(self):
         next_player_index = (self.current_player_index + self.direction) % len(self.players)
         for i in range(4):
-            if self.deck:
-                self.players[next_player_index].hand.append(self.deck.pop())
+            if self.__deck:
+                self.players[next_player_index].hand.append(self.__deck.pop())
         print(f"{self.players[next_player_index].name} Drew 4")
         self.choose_color()
         self.next_turn()
