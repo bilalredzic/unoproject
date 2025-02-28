@@ -223,6 +223,7 @@ class UnoGame:
                 self.shuffle_spent_deck()
             self.players[next_player_index].hand.append(self.deck.pop())
         print(f"{self.players[next_player_index].name} Drew 2")
+        self.current_player_index = next_player_index
         self.next_turn()
 
     def draw_four(self):
