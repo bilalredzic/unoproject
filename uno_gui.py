@@ -134,6 +134,7 @@ class UnoGUI:
             current_player.hand.append(drawn_card)
             self._update_game_display(f"{current_player.name} drew a card")
             self.game.next_turn()
+            self._update_display(0)
 
     def _update_game_display(self, message):
         current_text = self.message_display.html_text
@@ -145,10 +146,11 @@ class UnoGUI:
         self._screen.fill((40, 40, 40))
 
         if len(self.game.deck) > 0:
-            top_card = self.game.deck[-1]
+            top_card = self.game.discard_pile[-1]
             self._draw_card(top_card, (350, 250))
 
         current_player = self.game.players[self.game.current_player_index]
+
         x_position = MARGIN
         for card in current_player.hand:
             self._draw_card(card, (x_position, 500))
