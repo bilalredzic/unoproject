@@ -1,4 +1,3 @@
-from player import Player
 from card import Color, UnoCard, CardType
 import random
 
@@ -81,12 +80,12 @@ class UnoGame:
     # Creates the deck that the players will be drawing from
     def create_deck(self):
         colors = [Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW]
-        values = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        values = [1, 2, 3, 4, 5, 6, 7, 8, 9]
         action_cards = ["skip", "reverse", "draw_two"]
         wild_cards = ["wild", "draw_four"]
         deck = []
         for color in colors:
-            deck.append(UnoCard(color, 0, CardType.NORMAL))  # Are we adding an extra 4 zeros when we should be having 4 less zeros? 0 is included in our values list.
+            deck.append(UnoCard(color, 0, CardType.NORMAL))
             for value in values:
                 deck.append(UnoCard(color, value, CardType.NORMAL))
                 deck.append(UnoCard(color, value, CardType.NORMAL))
