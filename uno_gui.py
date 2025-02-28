@@ -31,18 +31,18 @@ class UnoGUI:
     def _create_ui_elements(self):
         # Creates the draw button
         self.draw_button = gui.elements.UIButton(
-            relative_rect=pg.Rect((650, 500), (120, 40)),
+            relative_rect=pg.Rect((635, 400), (120, 40)),
             text='Draw',
             manager=self.ui_manager
         )
 
-        #self.color_dropdown = gui.elements.UIDropDownMenu(
+        # self.color_dropdown = gui.elements.UIDropDownMenu(
         #    options_list=['Red', 'Blue', 'Green', 'Yellow'],
         #    starting_option='Red',
         #    relative_rect=pg.Rect((650, 400), (120, 40)),
         #    manager=self.ui_manager
-        #)
-        #self.color_dropdown.hide()
+        # )
+        # self.color_dropdown.hide()
 
         # Creates the message box
         self.message_display = gui.elements.UITextBox(
@@ -97,12 +97,12 @@ class UnoGUI:
             if event.ui_element == self.draw_button:
                 self._handle_draw_action()
 
-        #if event.type == gui.UI_DROP_DOWN_MENU_CHANGED:
-            #if event.ui_element == self.color_dropdown:
-                #selected_color = event.text.lower()
-                #self.game.current_color = Color(selected_color)
-                #self.color_dropdown.hide()
-                #self.game.next_turn()
+        # if event.type == gui.UI_DROP_DOWN_MENU_CHANGED:
+            # if event.ui_element == self.color_dropdown:
+                # selected_color = event.text.lower()
+                # self.game.current_color = Color(selected_color)
+                # self.color_dropdown.hide()
+                # self.game.next_turn()
 
         self.ui_manager.process_events(event)
 
@@ -123,8 +123,8 @@ class UnoGUI:
                 else:
                     self._update_game_display(f"{current_player.name} played an invalid move")
 
-                #if selected_card.type == "WILD":
-                    #self.color_dropdown.show()
+                # if selected_card.type == "WILD":
+                    # self.color_dropdown.show()
 
     def _handle_draw_action(self):
         current_player = self.game.players[self.game.current_player_index]
@@ -159,7 +159,7 @@ class UnoGUI:
         pg.display.update()
 
     def _draw_card(self, card, position):
-        if card.color:
+        if card.color != Color.WILD:
             color_name = card.color.value
         else:
             color_name = 'wild'
@@ -167,7 +167,6 @@ class UnoGUI:
             card_value = str(card.value)
         else:
             card_value = card.value
-
         key = (color_name, card_value)
         card_image = self.card_images.get(key)
 

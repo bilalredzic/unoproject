@@ -84,8 +84,8 @@ class UnoGame:
                 deck.append(UnoCard(Color.WILD, wild, CardType.WILD))
 
         self.deck = deck
-    print("Deck Created!")  # delete when testing is finished
-    print(deck)  # delete when testing is finished
+        print("Deck Created!")  # delete when testing is finished
+        print(deck)  # delete when testing is finished
 
     def shuffle_deck(self):
         random.shuffle(self.__deck)
@@ -96,11 +96,9 @@ class UnoGame:
     def deal_cards(self):
         self.shuffle_deck()
         for player in self.players:
-            print(f"{player.name} is drawing cards")  # delete when testing is finished
             player.hand = []
             for i in range(7):
                 player.hand.append(self.deck.pop())
-                print(f"{player.hand}")  # delete when testing is finished
 
     # Puts the first card on the table
     def start_game(self):
@@ -110,7 +108,7 @@ class UnoGame:
             print(first_card)  # delete when testing is finished
             if first_card.type == CardType.NORMAL:
                 self.current_color = first_card.color
-                print("Success!")  # delete when testing is finished
+                print("Success: ", first_card)  # delete when testing is finished
                 break
             else:
                 self.deck.append(first_card)
