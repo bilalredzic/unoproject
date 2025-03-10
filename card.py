@@ -45,8 +45,3 @@ class UnoCard:
     @type.setter
     def type(self, new_type):
         self.__type = new_type
-
-
-class ColorCard(UnoCard):
-    def __init__(self, color, value, card_type):
-        super().__init__(color, value, card_type)

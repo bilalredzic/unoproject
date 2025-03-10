@@ -7,7 +7,6 @@ class UnoGame:
         self.__players = players
         self.__deck = []
         self.__discard_pile = []
-        self.__spent_deck = []
         self.__current_color = None
         self.__current_player_index = 0
         self.__direction = 1
@@ -44,14 +43,6 @@ class UnoGame:
     @deck.setter
     def deck(self, new_deck):
         self.__deck = new_deck
-
-    @property
-    def spent_deck(self):
-        return self.__spent_deck
-
-    @spent_deck.setter
-    def spent_deck(self, new_spent_deck):
-        self.__spent_deck = new_spent_deck
 
     @property
     def current_color(self):
@@ -99,20 +90,18 @@ class UnoGame:
             for i in range(4):
                 deck.append(UnoCard(Color.WILD, wild, CardType.WILD))
 
-        self.__deck = deck
-        print("Deck Created!")  # delete when testing is finished
-        print(deck)  # delete when testing is finished
+        self.deck = deck
 
     def shuffle_deck(self):
-        random.shuffle(self.__deck)
-        print("Shuffled Deck: ", self.__deck)  # delete when testing is finished
+        random.shuffle(self.deck)
+        # print("Shuffled Deck: ", self.deck)  # delete when testing is finished
 
-    def shuffle_spent_deck(self):
-        random.shuffle(self.__spent_deck)
-        print("Reshuffled The Deck: ", self.spent_deck)
-        self.__deck = self.spent_deck
-        self.spent_deck = []
-
+    def reshuffle(self):
+        random.shuffle(self.discard_pile)
+        self.deck = self.discard_pile
+        self.discard_pile = []
+        # print("Reshuffled Deck: ", self.deck)  # delete when testing is finished
+        # print(self.discard_pile)  # delete when testing is finished
 
     # Deals each player 7 random cards
     def deal_cards(self):
@@ -120,22 +109,21 @@ class UnoGame:
         for player in self.players:
             player.hand = []
             for i in range(7):
-                player.hand.append(self.__deck.pop())
+                player.hand.append(self.deck.pop())
 
     # Puts the first card on the table
     def start_game(self):
         self.deal_cards()
         while True:
-            first_card = self.__deck.pop(random.randrange(len(self.__deck)))
-            print(first_card)  # delete when testing is finished
+            first_card = self.deck.pop(random.randrange(len(self.deck)))
+            print(first_card)
             if first_card.type == CardType.NORMAL:
                 self.current_color = first_card.color
                 self.discard_pile.append(first_card)
-                print("Success: ", first_card)  # delete when testing is finished
                 break
             else:
-                self.__deck.append(first_card)
-                print("Retry")  # delete when testing is finished
+                self.deck.append(first_card)
+                print("Retry")
 
     def next_turn(self):
         self.current_player_index = (self.current_player_index + self.direction) % len(self.players)
@@ -219,7 +207,7 @@ class UnoGame:
         next_player_index = (self.current_player_index + self.direction) % len(self.players)
         for i in range(2):
             if len(self.__deck) == 0:
-                self.shuffle_spent_deck()
+                self.reshuffle()
             self.players[next_player_index].hand.append(self.__deck.pop())
         print(f"{self.players[next_player_index].name} Drew 2")
         self.current_player_index = next_player_index
@@ -229,7 +217,7 @@ class UnoGame:
         next_player_index = (self.current_player_index + self.direction) % len(self.players)
         for i in range(4):
             if len(self.__deck) == 0:
-                self.shuffle_spent_deck()
+                self.reshuffle()
             self.players[next_player_index].hand.append(self.__deck.pop())
         print(f"{self.players[next_player_index].name} Drew 4")
 
