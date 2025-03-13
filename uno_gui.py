@@ -22,16 +22,17 @@ class UnoGUI:
         self.start_new_game()
 
     def _create_ui_elements(self):
-        draw_card_image_path = "./images/uno_back.png"  # Change this to the actual image path
+        draw_card_image_path = "./images/blue_0.png"  # Change this to the actual image path
         draw_card_surface = pg.image.load(draw_card_image_path)
         draw_card_surface = pg.transform.scale(draw_card_surface, (CARD_WIDTH, CARD_HEIGHT))  # Scale it
 
         # Create an image button
         self.draw_button = gui.elements.UIImage(
-            relative_rect=pg.Rect((180, 200), (CARD_WIDTH, CARD_HEIGHT)),  # Position and size
+            relative_rect=pg.Rect((635, 400), (CARD_WIDTH, CARD_HEIGHT)),  # Position and size
             image_surface=draw_card_surface,
             manager=self.ui_manager
         )
+
         self.message_display = gui.elements.UITextBox(
             html_text="Welcome to Uno!<br>",
             relative_rect=pg.Rect((600, 10), (190, 380)),
@@ -53,6 +54,7 @@ class UnoGUI:
         self.winner = None
         self.play_again_button.hide()
         self.message_display.set_text("Welcome to Uno!")
+
         self.card_images = {}
         self.load_card_images()
 
@@ -104,6 +106,7 @@ class UnoGUI:
             mouse_position = pg.mouse.get_pos()
             if self.draw_button.rect.collidepoint(mouse_position):
                 self._handle_draw_action()
+
             self._handle_mouse_click(mouse_position)
 
         if event.type == gui.UI_BUTTON_PRESSED:
@@ -176,7 +179,7 @@ class UnoGUI:
 
         if len(self.game.deck) > 0:
             top_card = self.game.discard_pile[-1]
-            self._draw_card(top_card, (350, 200))
+            self._draw_card(top_card, (350, 250))
 
         current_player = self.game.players[self.game.current_player_index]
 
