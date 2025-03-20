@@ -8,6 +8,7 @@ from enum import Enum
 class Player:
     def __init__(self, name):
         self.__name = name
+        ## self.__icon = icon
         self.__hand = []
         self.__is_turn = False
 

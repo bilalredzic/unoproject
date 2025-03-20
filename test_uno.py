@@ -4,6 +4,7 @@ from card import UnoCard, Color, CardType
 from player import Player
 from UnoGame import UnoGame
 
+
 class TestUnoCard(unittest.TestCase):
     def test_card_initialization(self):
         card = UnoCard(Color.RED, 5, CardType.NORMAL)
@@ -20,6 +21,7 @@ class TestUnoCard(unittest.TestCase):
         card = UnoCard(Color.WILD, "wild", CardType.WILD)
         card.color = Color.RED
         self.assertEqual(card.color, Color.RED)
+
 
 class TestPlayer(unittest.TestCase):
     def test_player_initialization(self):
@@ -48,6 +50,7 @@ class TestPlayer(unittest.TestCase):
 
         self.assertFalse(player1.is_turn)
         self.assertTrue(player2.is_turn)
+
 
 class TestUnoGame(unittest.TestCase):
     def setUp(self):

@@ -7,6 +7,7 @@ from player import Player
 # Constants
 CARD_WIDTH, CARD_HEIGHT = 120, 180
 SCREEN_WIDTH, SCREEN_HEIGHT = 800, 600
+player_icon_height, player_icon_width = 30, 60
 MARGIN = 10
 
 
@@ -22,9 +23,9 @@ class UnoGUI:
         self.start_new_game()
 
     def _create_ui_elements(self):
-        draw_card_image_path = "./images/uno_back.png"  # Change this to the actual image path
+        draw_card_image_path = "./images/uno_back.png"  # Draw Pile Creation
         draw_card_surface = pg.image.load(draw_card_image_path)
-        draw_card_surface = pg.transform.scale(draw_card_surface, (CARD_WIDTH, CARD_HEIGHT))  # Scale it
+        draw_card_surface = pg.transform.scale(draw_card_surface, (CARD_WIDTH, CARD_HEIGHT))
 
         # Create an image button
         self.draw_button = gui.elements.UIImage(
@@ -32,6 +33,14 @@ class UnoGUI:
             image_surface=draw_card_surface,
             manager=self.ui_manager
         )
+
+        self.color_dropdown = gui.elements.UIDropDownMenu(
+           options_list=['Red', 'Blue', 'Green', 'Yellow'],
+           starting_option='Red',
+           relative_rect=pg.Rect((650, 400), (120, 40)),
+           manager=self.ui_manager
+        )
+        self.color_dropdown.hide()
 
         self.message_display = gui.elements.UITextBox(
             html_text="Welcome to Uno!<br>",
@@ -47,15 +56,18 @@ class UnoGUI:
         self.play_again_button.hide()
 
     def start_new_game(self):
-        self.game = UnoGame([Player("Player 1"), Player("Player 2")])
+        self.game = UnoGame([Player("Bob"), Player("Joe"), Player("Cherry"), Player("Apple")])
         self.game.create_deck()
         self.game.start_game()
         self.game_over = False
         self.winner = None
         self.play_again_button.hide()
-        self.message_display.set_text("Welcome to Uno!")
+        self.message_display.set_text("Welcome to Uno!\n")
         self.card_images = {}
+        self.load_Player_Icons()
         self.load_card_images()
+        self.message_display.show()
+        self.draw_button.show()
 
     def load_card_images(self):
         color_options = ['red', 'blue', 'green', 'yellow', 'wild']
@@ -75,6 +87,31 @@ class UnoGUI:
                 scaled_image = pg.transform.scale(image, (CARD_WIDTH, CARD_HEIGHT))
                 self.card_images[(color, action)] = scaled_image
 
+    def load_Player_Icons(self):
+        x = 0
+        for i in range(1, len(self.game.players)+1):
+            if self.game.current_player_index + 1 == i:
+                player_i_image_path = f"images/Player_Icons/Active Player Icon({i}).png"
+                player_i_surface = pg.image.load(player_i_image_path)
+                player_i_surface = pg.transform.scale(player_i_surface, (player_icon_height, player_icon_width))
+                self.player_A_icon = gui.elements.UIImage(
+                    relative_rect=pg.Rect((x, 0), (player_icon_height, player_icon_width)),  # Position and size
+                    image_surface=player_i_surface,
+                    manager=self.ui_manager
+                )
+            else:
+                player_i_image_path = f"images/Player_Icons/Player Icon({i}).png"  # PlayerIcon
+                player_i_surface = pg.image.load(player_i_image_path)
+                player_i_surface = pg.transform.scale(player_i_surface, (player_icon_height, player_icon_width))
+                self.player_B_icon = gui.elements.UIImage(
+                relative_rect=pg.Rect((x, 0), (player_icon_height, player_icon_width)),  # Position and size
+                image_surface=player_i_surface,
+                manager=self.ui_manager
+            )
+
+            x += 40
+
+
     def run_game(self):
         clock = pg.time.Clock()
         running = True
@@ -86,6 +123,9 @@ class UnoGUI:
                     running = False
 
                 self._handle_event(event)
+                self.player_A_icon.hide()
+                self.player_B_icon.hide()
+                self.load_Player_Icons()
 
             if self.game_over:
                 self._show_win_screen()
@@ -161,7 +201,8 @@ class UnoGUI:
         text_surface = font.render(f"{self.winner} WINS!", True, (255, 255, 255))
         text_rect = text_surface.get_rect(center=(SCREEN_WIDTH // 2, 250))
         self._screen.blit(text_surface, text_rect)
-
+        self.message_display.hide()
+        self.draw_button.hide()
         self.play_again_button.show()
         self.ui_manager.update(0)
         self.ui_manager.draw_ui(self._screen)

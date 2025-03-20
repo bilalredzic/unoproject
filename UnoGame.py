@@ -113,10 +113,12 @@ class UnoGame:
 
     # Puts the first card on the table
     def start_game(self):
+        current_player = self.players[self.current_player_index]  # testing purposes
+        print(f"{current_player.name}'s Turn")  # testing purposes
         self.deal_cards()
         while True:
             first_card = self.deck.pop(random.randrange(len(self.deck)))
-            print(first_card)
+            print(f"Currently: {first_card.type}, {first_card.color}, {first_card.value}")
             if first_card.type == CardType.NORMAL:
                 self.current_color = first_card.color
                 self.discard_pile.append(first_card)
@@ -130,7 +132,8 @@ class UnoGame:
         for player in self.players:
             player.is_turn = False
         self.players[self.current_player_index].is_turn = True
-        print(f"It Is Now: {self.players[self.current_player_index]} Turn")
+        current_player = self.players[self.current_player_index]
+        print(f"{current_player.name}'s Turn")
 
     def play_card(self, player, card):
         last_played_card = self.discard_pile[-1]
@@ -157,7 +160,6 @@ class UnoGame:
                 self.skip_player()
             elif card.value == "reverse":
                 self.reverse_direction()
-
             elif card.value == "draw_two":
                 self.draw_two()
             elif card.value == "draw_four":
