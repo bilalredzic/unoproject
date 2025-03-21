@@ -17,7 +17,7 @@ class UnoGUI:
         self._screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         pg.display.set_caption("UNO")
 
-        self.ui_manager = gui.UIManager((SCREEN_WIDTH, SCREEN_HEIGHT))
+        self.ui_manager = gui.UIManager((SCREEN_WIDTH, SCREEN_HEIGHT), 'theme.json')
 
         self._create_ui_elements()
         self.start_new_game()
@@ -152,6 +152,19 @@ class UnoGUI:
             if event.ui_element == self.draw_button:
                 self._handle_draw_action()
 
+        if event.type == gui.UI_DROP_DOWN_MENU_CHANGED and event.ui_element == self.color_dropdown:
+            chosen_color = event.text.lower()
+            self.game.current_color = Color(chosen_color)
+            self.color_dropdown.hide()
+
+            if self.game.pending_wild_card.value == "draw_four":
+                self.game.draw_four()
+            else:
+                self.game.next_turn()
+
+            self._update_game_display(f"Color changed to {chosen_color.upper()}")
+            self._check_for_win()
+
         self.ui_manager.process_events(event)
 
     def _handle_mouse_click(self, position):
@@ -166,8 +179,17 @@ class UnoGUI:
 
             if card_index < len(current_player.hand):
                 selected_card = current_player.hand[card_index]
-                if self.game.play_card(current_player, selected_card) is not False:
-                    self._update_game_display(f"{current_player.name} played {selected_card.color.value} {selected_card.value}")
+                play_result = self.game.play_card(current_player, selected_card)
+
+                if play_result == "choose_color":
+                    self.color_dropdown.show()
+                    self.selected_card = selected_card  # Save the wild card for post-color-selection logic
+                    self._update_game_display(
+                        f"{current_player.name} played {selected_card.value.upper()} - choose a color")
+                    return
+                elif play_result is not False:
+                    self._update_game_display(
+                        f"{current_player.name} played {selected_card.color.value} {selected_card.value}")
                 else:
                     self._update_game_display(f"{current_player.name} played an invalid move")
 

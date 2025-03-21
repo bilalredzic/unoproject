@@ -1,0 +1,43 @@
+{
+    "globals": {
+        "font_name": "Arial",
+        "font_size": 18,
+        "font_color": "#FFFFFF"
+    },
+    "drop_down_menu": {
+        "normal_bg": "#FF0000",
+        "normal_text": "#FFFFFF",
+        "hovered_bg": "#555555",
+        "hovered_text": "#FFFFFF",
+        "border_color": "#FFCC00",
+        "border_width": 2,
+        "selection_color": "#666666",
+        "selection_text": "#FFFFFF",
+        "container": {
+            "margin": 5,
+            "padding": 5
+        }
+    },
+    "button": {
+        "normal_bg": "#333333",
+        "normal_text": "#FFFFFF",
+        "hovered_bg": "#444444",
+        "hovered_text": "#FFFFFF",
+        "border_color": "#FFCC00",
+        "border_width": 2,
+        "container": {
+            "margin": 5,
+            "padding": 10
+        }
+    },
+    "text_box": {
+        "normal_bg": "#222222",
+        "normal_text": "#FFFFFF",
+        "border_color": "#FFCC00",
+        "border_width": 1,
+        "container": {
+            "margin": 5,
+            "padding": 5
+        }
+    }
+}

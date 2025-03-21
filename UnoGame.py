@@ -11,6 +11,7 @@ class UnoGame:
         self.__current_player_index = 0
         self.__direction = 1
         self.__message_code = None
+        self.__pending_wild_card = None
 
     @property
     def players(self):
@@ -67,6 +68,14 @@ class UnoGame:
     @direction.setter
     def direction(self, new_direction):
         self.__direction = new_direction
+
+    @property
+    def pending_wild_card(self):
+        return self.__pending_wild_card
+
+    @pending_wild_card.setter
+    def pending_wild_card(self, new):
+        self.__pending_wild_card = new
 
     # Creates the deck that the players will be drawing from
     def create_deck(self):
@@ -147,12 +156,8 @@ class UnoGame:
             self.discard_pile.append(card)
 
             if card.color == Color.WILD:
-                self.choose_color()
-                if card.value == "draw_four":
-                    self.draw_four()
-                else:
-                    self.next_turn()
-                return
+                self.pending_wild_card = card  # Store card to apply effect after color is chosen
+                return "choose_color"
 
             self.current_color = card.color
 
@@ -170,26 +175,6 @@ class UnoGame:
             print(f"Invalid move! You can't play {card.color.value} {card.value}")
             return False
 
-    def choose_color(self):
-        valid_colors = [Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW]
-        while True:
-            chosen_color = input("Choose a color (red, blue, green, yellow): ").strip().lower()
-            color_values = []
-            for color in valid_colors:
-                color_values.append(color.value)
-
-            if chosen_color in color_values:
-                selected_color = None
-                for color in valid_colors:
-                    if color.value == chosen_color:
-                        selected_color = color
-                        break
-
-                self.current_color = selected_color
-                print(f"Color changed to {self.current_color.value.upper()}")
-                return
-            else:
-                print("Invalid color, try again. Please enter: red, blue, green, or yellow.")
 
     def skip_player(self):
         skipped_player_index = (self.current_player_index + self.direction) % len(self.players)
