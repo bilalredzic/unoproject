@@ -146,6 +146,8 @@ class UnoGUI:
                 self._handle_event(event)
                 self.player_A_icon.hide()
                 self.player_B_icon.hide()
+                self.direction_right_icon.hide()
+                self.direction_left_icon.hide()
                 self.load_Player_Icons()
 
             if self.game_over:
