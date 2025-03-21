@@ -56,7 +56,7 @@ class UnoGUI:
         self.play_again_button.hide()
 
     def start_new_game(self):
-        self.game = UnoGame([Player("Bob"), Player("Joe"), Player("Cherry"), Player("Apple")])
+        self.game = UnoGame([Player("1"), Player("2"), Player("3")])
         self.game.create_deck()
         self.game.start_game()
         self.game_over = False
@@ -88,7 +88,29 @@ class UnoGUI:
                 self.card_images[(color, action)] = scaled_image
 
     def load_Player_Icons(self):
-        x = 0
+        direction_image_path = f"images/Player_Icons/Direction Right.png"  # PlayerIcon
+        direction_surface = pg.image.load(direction_image_path)
+        direction_surface = pg.transform.scale(direction_surface, (50, 30))
+        self.direction_right_icon = gui.elements.UIImage(
+            relative_rect=pg.Rect((5, 15), (50, 30)),  # Position and size
+            image_surface=direction_surface,
+            manager=self.ui_manager
+        )
+        direction_image_path = f"images/Player_Icons/Direction Left.png"
+        direction_surface = pg.image.load(direction_image_path)
+        direction_surface = pg.transform.scale(direction_surface, (50, 30))
+        self.direction_left_icon = gui.elements.UIImage(
+            relative_rect=pg.Rect((5, 15), (50, 30)),  # Position and size
+            image_surface=direction_surface,
+            manager=self.ui_manager
+        )
+        if self.game.direction == 1:
+            self.direction_right_icon.show()
+            self.direction_left_icon.hide()
+        if self.game.direction == -1:
+            self.direction_left_icon.show()
+            self.direction_right_icon.hide()
+        x = 60
         for i in range(1, len(self.game.players)+1):
             if self.game.current_player_index + 1 == i:
                 player_i_image_path = f"images/Player_Icons/Active Player Icon({i}).png"
@@ -104,11 +126,10 @@ class UnoGUI:
                 player_i_surface = pg.image.load(player_i_image_path)
                 player_i_surface = pg.transform.scale(player_i_surface, (player_icon_height, player_icon_width))
                 self.player_B_icon = gui.elements.UIImage(
-                relative_rect=pg.Rect((x, 0), (player_icon_height, player_icon_width)),  # Position and size
-                image_surface=player_i_surface,
-                manager=self.ui_manager
+                    relative_rect=pg.Rect((x, 0), (player_icon_height, player_icon_width)),  # Position and size
+                    image_surface=player_i_surface,
+                    manager=self.ui_manager
             )
-
             x += 40
 
 
@@ -225,6 +246,10 @@ class UnoGUI:
         self._screen.blit(text_surface, text_rect)
         self.message_display.hide()
         self.draw_button.hide()
+        self.direction_right_icon.hide()
+        self.direction_left_icon.hide()
+        self.player_A_icon.hide()
+        self.player_B_icon.hide()
         self.play_again_button.show()
         self.ui_manager.update(0)
         self.ui_manager.draw_ui(self._screen)
