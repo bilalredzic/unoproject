@@ -14,6 +14,7 @@ MARGIN = 10
 class UnoGUI:
     def __init__(self):
         pg.init()
+
         self._screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         pg.display.set_caption("UNO")
 
@@ -22,6 +23,10 @@ class UnoGUI:
         self._create_ui_elements()
         self.start_new_game()
 
+    def show_blank_screen(self):
+        self._screen.fill((0, 0, 0))
+        pg.display.flip()
+        pg.time.delay(1000)
     def _create_ui_elements(self):
         draw_card_image_path = "./images/uno_back.png"  # Draw Pile Creation
         draw_card_surface = pg.image.load(draw_card_image_path)
@@ -155,6 +160,7 @@ class UnoGUI:
             else:
                 self._update_display(time_delta)
 
+
         pg.quit()
 
     def _handle_event(self, event):
@@ -209,10 +215,12 @@ class UnoGUI:
                     self.selected_card = selected_card  # Save the wild card for post-color-selection logic
                     self._update_game_display(
                         f"{current_player.name} played {selected_card.value.upper()} - choose a color")
+                    self.show_blank_screen()
                     return
                 elif play_result is not False:
                     self._update_game_display(
                         f"{current_player.name} played {selected_card.color.value} {selected_card.value}")
+                    self.show_blank_screen()
                 else:
                     self._update_game_display(f"{current_player.name} played an invalid move")
 
@@ -228,6 +236,7 @@ class UnoGUI:
             drawn_card = self.game.deck.pop()
             current_player.hand.append(drawn_card)
             self._update_game_display(f"{current_player.name} drew a card")
+            self.show_blank_screen()
             self.game.next_turn()
 
         self._check_for_win()
