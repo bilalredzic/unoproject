@@ -24,9 +24,11 @@ class UnoGUI:
         self.start_new_game()
 
     def show_blank_screen(self):
-        self._screen.fill((0, 0, 0))
+        self._screen.fill((40, 40, 40))
         pg.display.flip()
-        pg.time.delay(1000)
+        pg.time.delay(600)
+
+
     def _create_ui_elements(self):
         draw_card_image_path = "./images/uno_back.png"  # Draw Pile Creation
         draw_card_surface = pg.image.load(draw_card_image_path)
@@ -61,7 +63,8 @@ class UnoGUI:
         self.play_again_button.hide()
 
     def start_new_game(self):
-        self.game = UnoGame([Player("1"), Player("2"), Player("3")])
+        self.game = UnoGame([Player("1"), Player("2"), Player("3"), Player("4"), Player("5"), Player("6"),
+                             Player("7"), Player("8"), Player("9"), Player("10")])
         self.game.create_deck()
         self.game.start_game()
         self.game_over = False
@@ -134,9 +137,8 @@ class UnoGUI:
                     relative_rect=pg.Rect((x, 0), (player_icon_height, player_icon_width)),  # Position and size
                     image_surface=player_i_surface,
                     manager=self.ui_manager
-            )
+                )
             x += 40
-
 
     def run_game(self):
         clock = pg.time.Clock()
@@ -159,8 +161,6 @@ class UnoGUI:
                 self._show_win_screen()
             else:
                 self._update_display(time_delta)
-
-
         pg.quit()
 
     def _handle_event(self, event):
@@ -203,7 +203,7 @@ class UnoGUI:
         x, y = position
         current_player = self.game.players[self.game.current_player_index]
 
-        if y >= 500 and y <= 500 + CARD_HEIGHT:
+        if 500 <= y <= 500 + CARD_HEIGHT:
             card_index = (x - MARGIN) // (CARD_WIDTH // 2)
 
             if card_index < len(current_player.hand):
@@ -250,7 +250,6 @@ class UnoGUI:
     def _show_win_screen(self):
         """Displays a separate win screen."""
         self._screen.fill((0, 0, 0))
-
         font = pg.font.Font(None, 64)
         text_surface = font.render(f"{self.winner} WINS!", True, (255, 255, 255))
         text_rect = text_surface.get_rect(center=(SCREEN_WIDTH // 2, 250))
