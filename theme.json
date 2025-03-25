@@ -1,43 +1,30 @@
 {
-    "globals": {
-        "font_name": "Arial",
-        "font_size": 18,
-        "font_color": "#FFFFFF"
-    },
-    "drop_down_menu": {
-        "normal_bg": "#FF0000",
-        "normal_text": "#FFFFFF",
-        "hovered_bg": "#555555",
-        "hovered_text": "#FFFFFF",
-        "border_color": "#FFCC00",
-        "border_width": 2,
-        "selection_color": "#666666",
-        "selection_text": "#FFFFFF",
-        "container": {
-            "margin": 5,
-            "padding": 5
-        }
-    },
-    "button": {
-        "normal_bg": "#333333",
-        "normal_text": "#FFFFFF",
-        "hovered_bg": "#444444",
-        "hovered_text": "#FFFFFF",
-        "border_color": "#FFCC00",
-        "border_width": 2,
-        "container": {
-            "margin": 5,
-            "padding": 10
-        }
-    },
-    "text_box": {
-        "normal_bg": "#222222",
-        "normal_text": "#FFFFFF",
-        "border_color": "#FFCC00",
-        "border_width": 1,
-        "container": {
-            "margin": 5,
-            "padding": 5
-        }
-    }
+  "defaults": {
+    "font": "default",
+    "font_size": 14,
+    "text_color": "#FFFFFF",
+    "background_color": "#1e1e1e"
+  },
+  "#game_log": {
+  "font_size": 9,
+  "text_color": "#00FF00",
+  "background_color": "#000000",
+  "border_width": 2,
+  "border_color": "#00FF00",
+  "padding": 10
+}
+,
+  "#login_message": {
+    "font_size": 16,
+    "text_color": "#FFD700",
+    "background_color": "#1e1e1e",
+    "padding": 5
+  },
+  "#play_again_button": {
+    "font_size": 16,
+    "text_color": "#FFFFFF",
+    "background_color": "#ff4444",
+    "border_color": "#bb0000",
+    "border_width": 2
+  }
 }
