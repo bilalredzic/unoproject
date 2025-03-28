@@ -27,7 +27,8 @@ class UnoGUI:
         self.card_images = {}
         self.scroll_to_bottom_pending = False
         self.card_scroll_offset = 0
-
+        self.game_over = False
+        self.win_screen_shown = False
         self._create_login_ui()
 
     def _create_login_ui(self):
@@ -46,7 +47,7 @@ class UnoGUI:
 
         self.login_message_display = gui.elements.UITextBox(
             html_text="Enter number of players and names:<br>",
-            relative_rect=pg.Rect((250, 10), (300, 30)),
+            relative_rect=pg.Rect((250, 10), (300, 35)),
             manager=self.ui_manager,
             object_id="#login_message"
         )
@@ -219,12 +220,21 @@ class UnoGUI:
                 self._screen.fill((40, 40, 40))
                 self.ui_manager.update(time_delta)
                 self.ui_manager.draw_ui(self._screen)
-                pg.display.update()
+                pg.display.flip()
                 continue
 
             if self.game_over:
-                self._show_win_screen()
+                if not self.win_screen_shown:
+                    self._show_win_screen()
+                    self.win_screen_shown = True
+                else:
+
+                    self.ui_manager.update(time_delta)
+                    self.ui_manager.draw_ui(self._screen)
+                    pg.display.flip()
+
             else:
+                # Normal, in-game rendering
                 self.load_Player_Icons()
                 self._update_display(time_delta)
 
@@ -285,20 +295,25 @@ class UnoGUI:
             self.game.current_color = Color(chosen_color)
             self.color_dropdown.hide()
 
-            if self.game.pending_wild_card.value == "draw_four":
+            is_draw_four = (self.game.pending_wild_card.value == "draw_four")
+
+            if is_draw_four:
                 self.game.draw_four()
             else:
                 self.game.next_turn()
 
             self._update_game_display(f"Color shifted to {chosen_color.upper()}!")
-            self.show_blank_screen()
+
+            if not (len(self.game.players) == 2 and is_draw_four):
+                self.show_blank_screen()
+
             self._check_for_win()
 
     def _handle_mouse_click(self, position):
         if self.game_over:
             return
         if self.left_scroll_btn.rect.collidepoint(position) or self.right_scroll_btn.rect.collidepoint(position):
-            return  # Don't process this as a card click
+            return
 
         x, y = position
         current_player = self.game.players[self.game.current_player_index]
@@ -319,19 +334,19 @@ class UnoGUI:
                     color = selected_card.color.value.capitalize()
                     value = str(selected_card.value).replace("_", " ").title()
 
-                    msg = (f"🔥 {current_player.name} unleashed a WILD Draw Four!"
-                           if value.lower() == "draw four" else
-                           f"{current_player.name} played a {color} {value}")
+                    msg = (
+                        f"🔥 {current_player.name} unleashed a WILD Draw Four!"
+                        if value.lower() == "draw four" else
+                        f"{current_player.name} played a {color} {value}"
+                    )
                     self._update_game_display(msg)
 
-                    image_key = (selected_card.color.value if selected_card.color != Color.WILD else 'wild', str(selected_card.value))
-                    card_image = self.card_images.get(image_key)
-                    start_pos = (x, 500)
-                    end_pos = (350, 200)
+                    special_actions_excluding_wild = ["skip", "reverse", "draw two", "draw four"]
+                    two_player_game = (len(self.game.players) == 2)
+                    is_special_action = (value.lower() in special_actions_excluding_wild)
 
-                    self.show_blank_screen()
-                else:
-                    self._update_game_display(f"{current_player.name} played an invalid move")
+                    if not (two_player_game and is_special_action):
+                        self.show_blank_screen()
 
         self._check_for_win()
 
@@ -356,7 +371,6 @@ class UnoGUI:
                 self.winner = player.name
 
     def _show_win_screen(self):
-        # 🎉 Confetti animation
         confetti = []
         for _ in range(100):
             x = random.randint(0, SCREEN_WIDTH)
@@ -365,11 +379,17 @@ class UnoGUI:
             speed = random.uniform(1, 4)
             confetti.append({"pos": [x, y], "color": color, "speed": speed})
 
-        start = pg.time.get_ticks()
-        while pg.time.get_ticks() - start < 1500:
+        start_time = pg.time.get_ticks()
+        while pg.time.get_ticks() - start_time < 1500:
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    pg.quit()
+
+
             self._screen.fill((0, 0, 0))
             for c in confetti:
-                pg.draw.circle(self._screen, c["color"], (int(c["pos"][0]), int(c["pos"][1])), 4)
+                pg.draw.circle(self._screen, c["color"],
+                               (int(c["pos"][0]), int(c["pos"][1])), 4)
                 c["pos"][1] += c["speed"]
 
             self.ui_manager.update(0)
@@ -377,22 +397,25 @@ class UnoGUI:
             pg.display.flip()
             pg.time.delay(16)
 
-        # Win text
+        self._screen.fill((0, 0, 0))
         font = pg.font.Font(None, 64)
         text_surface = font.render(f"{self.winner} WINS!", True, (255, 255, 255))
         text_rect = text_surface.get_rect(center=(SCREEN_WIDTH // 2, 250))
         self._screen.blit(text_surface, text_rect)
+
         self.message_display.hide()
         self.draw_button.hide()
         self.direction_right_icon.hide()
         self.direction_left_icon.hide()
+        self.message_panel.hide()
         for icon in self.player_icons:
             icon.hide()
+
         self.play_again_button.show()
+
         self.ui_manager.update(0)
         self.ui_manager.draw_ui(self._screen)
-        pg.display.update()
-
+        pg.display.flip()
 
     def _draw_static_ui(self):
         if len(self.game.deck) > 0:
@@ -408,7 +431,6 @@ class UnoGUI:
     def _update_game_display(self, message):
         current_text = self.message_display.html_text
 
-        # Highlight important messages
         if "draw four" in message.lower():
             message = f"<font color='#FF4444'><b>{message}</b></font>"
         elif "wild" in message.lower():
