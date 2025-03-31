@@ -102,13 +102,13 @@ class UnoGUI:
         self.color_dropdown.hide()
 
         self.message_panel = gui.elements.UIPanel(
-            relative_rect=pg.Rect((580, 10), (210, 380)),
+            relative_rect=pg.Rect((540, 10), (255, 385)),
             manager=self.ui_manager
         )
 
         self.message_display = gui.elements.UITextBox(
             html_text="Welcome to Uno!<br>",
-            relative_rect=pg.Rect((10, 10), (190, 360)),
+            relative_rect=pg.Rect((10, 10), (230, 360)),
             container=self.message_panel,
             manager=self.ui_manager,
             object_id="#game_log"
@@ -150,8 +150,6 @@ class UnoGUI:
             text=">",
             manager=self.ui_manager
         )
-
-
 
     def show_blank_screen(self):
         self._screen.fill((40, 40, 40))
@@ -282,12 +280,12 @@ class UnoGUI:
 
             # scroll handling
             elif event.ui_element == self.left_scroll_btn:
-                self.card_scroll_offset = max(0, self.card_scroll_offset - 60)
+                self.card_scroll_offset = max(0, self.card_scroll_offset - 460)
                 print(f"Scrolled left: {self.card_scroll_offset}")
             elif event.ui_element == self.right_scroll_btn:
                 hand = self.game.players[self.game.current_player_index].hand
                 max_scroll = max(0, len(hand) * (CARD_WIDTH // 2) - SCREEN_WIDTH + 80)
-                self.card_scroll_offset = min(max_scroll, self.card_scroll_offset + 60)
+                self.card_scroll_offset = min(max_scroll, self.card_scroll_offset + 460)
                 print(f"Scrolled right: {self.card_scroll_offset}")
 
         if event.type == gui.UI_DROP_DOWN_MENU_CHANGED and event.ui_element == self.color_dropdown:
@@ -371,8 +369,27 @@ class UnoGUI:
                 self.winner = player.name
 
     def _show_win_screen(self):
+        self._screen.fill((0, 0, 0))
+        font = pg.font.Font(None, 64)
+        text_surface = font.render(f"{self.winner} WINS!", True, (255, 255, 255))
+        text_rect = text_surface.get_rect(center=(SCREEN_WIDTH // 2, 250))
+        self._screen.blit(text_surface, text_rect)
+
+        self.message_display.hide()
+        self.color_dropdown.hide()
+        self.draw_button.hide()
+        self.direction_right_icon.hide()
+        self.direction_left_icon.hide()
+        self.message_panel.hide()
+        self.right_scroll_btn.hide()
+        self.left_scroll_btn.hide()
+        for icon in self.player_icons:
+            icon.hide()
+
+        self.play_again_button.show()
+
         confetti = []
-        for _ in range(100):
+        for _ in range(200):
             x = random.randint(0, SCREEN_WIDTH)
             y = random.randint(-400, 0)
             color = [random.randint(100, 255) for _ in range(3)]
@@ -380,13 +397,17 @@ class UnoGUI:
             confetti.append({"pos": [x, y], "color": color, "speed": speed})
 
         start_time = pg.time.get_ticks()
-        while pg.time.get_ticks() - start_time < 1500:
+        while pg.time.get_ticks() - start_time < 50000:
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     pg.quit()
+                # elif self.game_over:
+                    # if event.type == gui.UI_BUTTON_PRESSED and event.ui_element == self.play_again_button:
+                        # self.play_again_button.hide()
+                        # self._create_login_ui()
+                        # self.state = "login"
+                    # return
 
-
-            self._screen.fill((0, 0, 0))
             for c in confetti:
                 pg.draw.circle(self._screen, c["color"],
                                (int(c["pos"][0]), int(c["pos"][1])), 4)
@@ -397,21 +418,10 @@ class UnoGUI:
             pg.display.flip()
             pg.time.delay(16)
 
-        self._screen.fill((0, 0, 0))
         font = pg.font.Font(None, 64)
         text_surface = font.render(f"{self.winner} WINS!", True, (255, 255, 255))
         text_rect = text_surface.get_rect(center=(SCREEN_WIDTH // 2, 250))
         self._screen.blit(text_surface, text_rect)
-
-        self.message_display.hide()
-        self.draw_button.hide()
-        self.direction_right_icon.hide()
-        self.direction_left_icon.hide()
-        self.message_panel.hide()
-        for icon in self.player_icons:
-            icon.hide()
-
-        self.play_again_button.show()
 
         self.ui_manager.update(0)
         self.ui_manager.draw_ui(self._screen)
