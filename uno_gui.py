@@ -29,6 +29,8 @@ class UnoGUI:
         self.card_scroll_offset = 0
         self.game_over = False
         self.win_screen_shown = False
+        self.confetti_list = []
+        self.confetti_active = False
         self._create_login_ui()
 
     def _create_login_ui(self):
@@ -45,9 +47,9 @@ class UnoGUI:
             manager=self.ui_manager
         )
 
-        self.login_message_display = gui.elements.UITextBox(
-            html_text="Enter number of players and names:<br>",
+        self.login_message_display = gui.elements.UILabel(
             relative_rect=pg.Rect((250, 10), (300, 35)),
+            text="Enter number of players and names:",
             manager=self.ui_manager,
             object_id="#login_message"
         )
@@ -209,6 +211,7 @@ class UnoGUI:
 
         while running:
             time_delta = clock.tick(30) / 1000.0
+
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     running = False
@@ -221,20 +224,12 @@ class UnoGUI:
                 pg.display.flip()
                 continue
 
-            if self.game_over:
-                if not self.win_screen_shown:
-                    self._show_win_screen()
-                    self.win_screen_shown = True
-                else:
-
-                    self.ui_manager.update(time_delta)
-                    self.ui_manager.draw_ui(self._screen)
-                    pg.display.flip()
-
-            else:
-                # Normal, in-game rendering
+            if self.game_over and not self.win_screen_shown:
+                self._show_win_screen()
+                self.win_screen_shown = True
+            if not self.game_over:
                 self.load_Player_Icons()
-                self._update_display(time_delta)
+            self._update_display(time_delta)
 
         pg.quit()
 
@@ -257,9 +252,14 @@ class UnoGUI:
 
         if self.game_over:
             if event.type == gui.UI_BUTTON_PRESSED and event.ui_element == self.play_again_button:
+                self.confetti_list.clear()
+                self.confetti_active = False
+
                 self.play_again_button.hide()
+
                 self._create_login_ui()
                 self.state = "login"
+                self.win_screen_shown = False
             return
 
         if event.type == pg.MOUSEBUTTONDOWN:
@@ -370,10 +370,6 @@ class UnoGUI:
 
     def _show_win_screen(self):
         self._screen.fill((0, 0, 0))
-        font = pg.font.Font(None, 64)
-        text_surface = font.render(f"{self.winner} WINS!", True, (255, 255, 255))
-        text_rect = text_surface.get_rect(center=(SCREEN_WIDTH // 2, 250))
-        self._screen.blit(text_surface, text_rect)
 
         self.message_display.hide()
         self.color_dropdown.hide()
@@ -388,44 +384,43 @@ class UnoGUI:
 
         self.play_again_button.show()
 
-        confetti = []
-        for _ in range(200):
+        self.confetti_list.clear()
+        for i in range(200):
             x = random.randint(0, SCREEN_WIDTH)
             y = random.randint(-400, 0)
-            color = [random.randint(100, 255) for _ in range(3)]
+
+            color_components = []
+            for j in range(3):
+                color_components.append(random.randint(100, 255))
+
             speed = random.uniform(1, 4)
-            confetti.append({"pos": [x, y], "color": color, "speed": speed})
+            self.confetti_list.append({
+                "pos": [x, y],
+                "color": color_components,
+                "speed": speed
+            })
 
-        start_time = pg.time.get_ticks()
-        while pg.time.get_ticks() - start_time < 50000:
-            for event in pg.event.get():
-                if event.type == pg.QUIT:
-                    pg.quit()
-                # elif self.game_over:
-                    # if event.type == gui.UI_BUTTON_PRESSED and event.ui_element == self.play_again_button:
-                        # self.play_again_button.hide()
-                        # self._create_login_ui()
-                        # self.state = "login"
-                    # return
+        self.confetti_active = True
 
-            for c in confetti:
-                pg.draw.circle(self._screen, c["color"],
-                               (int(c["pos"][0]), int(c["pos"][1])), 4)
-                c["pos"][1] += c["speed"]
+    def _draw_confetti(self):
+        for c in self.confetti_list:
+            pg.draw.circle(self._screen, c["color"], (int(c["pos"][0]), int(c["pos"][1])), 4)
+            c["pos"][1] += c["speed"]
+        filtered_confetti = []
+        for c in self.confetti_list:
+            if c["pos"][1] < SCREEN_HEIGHT + 10:
+                filtered_confetti.append(c)
 
-            self.ui_manager.update(0)
-            self.ui_manager.draw_ui(self._screen)
-            pg.display.flip()
-            pg.time.delay(16)
+        self.confetti_list = filtered_confetti
 
+    def _draw_winner_text(self):
+        if not self.winner:
+            return
         font = pg.font.Font(None, 64)
         text_surface = font.render(f"{self.winner} WINS!", True, (255, 255, 255))
-        text_rect = text_surface.get_rect(center=(SCREEN_WIDTH // 2, 250))
+        text_rect = text_surface.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 50))
         self._screen.blit(text_surface, text_rect)
 
-        self.ui_manager.update(0)
-        self.ui_manager.draw_ui(self._screen)
-        pg.display.flip()
 
     def _draw_static_ui(self):
         if len(self.game.deck) > 0:
@@ -459,7 +454,12 @@ class UnoGUI:
 
     def _update_display(self, time_delta):
         self._screen.fill((40, 40, 40))
-        self._draw_static_ui()
+        if self.game_over and self.confetti_active:
+            self._draw_confetti()
+            self._draw_winner_text()
+        else:
+            self._draw_static_ui()
+
         self.ui_manager.update(time_delta)
         self.ui_manager.draw_ui(self._screen)
         pg.display.update()
