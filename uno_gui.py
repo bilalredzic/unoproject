@@ -15,6 +15,10 @@ class UnoGUI:
     def __init__(self):
         pg.init()
         self._screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+        background = pg.image.load(f"images/Player_Icons/Uno_Background.jpg")
+        background = pg.transform.scale(background, (SCREEN_WIDTH, SCREEN_HEIGHT))
+        self._screen.blit(background, (0, 0))
+        pg.display.update()
         pg.display.set_caption("UNO")
         self.ui_manager = gui.UIManager((SCREEN_WIDTH, SCREEN_HEIGHT), 'theme.json')
 
@@ -218,7 +222,6 @@ class UnoGUI:
                 self._handle_event(event)
 
             if self.state == "login":
-                self._screen.fill((40, 40, 40))
                 self.ui_manager.update(time_delta)
                 self.ui_manager.draw_ui(self._screen)
                 pg.display.flip()
@@ -453,7 +456,9 @@ class UnoGUI:
         pg.display.set_caption(f"UNO - {message}")
 
     def _update_display(self, time_delta):
-        self._screen.fill((40, 40, 40))
+        background = pg.image.load(f"images/Player_Icons/Uno_Background.jpg")
+        background = pg.transform.scale(background, (SCREEN_WIDTH, SCREEN_HEIGHT))
+        self._screen.blit(background, (0, 0))
         if self.game_over and self.confetti_active:
             self._draw_confetti()
             self._draw_winner_text()
