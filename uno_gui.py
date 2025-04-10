@@ -317,23 +317,28 @@ class UnoGUI:
     def _handle_mouse_click(self, position):
         if self.game_over:
             return
+
         if self.left_scroll_btn.rect.collidepoint(position) or self.right_scroll_btn.rect.collidepoint(position):
             return
 
         x, y = position
-        current_player = self.game.players[self.game.current_player_index]
-
         if 500 <= y <= 500 + CARD_HEIGHT:
-            card_index = (x - MARGIN) // (CARD_WIDTH // 2)
-            if card_index < len(current_player.hand):
+            relative_x = x - (MARGIN - self.card_scroll_offset)
+
+            if relative_x < 0:
+                return
+
+            card_index = relative_x // (CARD_WIDTH // 2)
+            current_player = self.game.players[self.game.current_player_index]
+
+            if 0 <= card_index < len(current_player.hand):
                 selected_card = current_player.hand[card_index]
                 play_result = self.game.play_card(current_player, selected_card)
 
                 if play_result == "choose_color":
                     self.color_dropdown.show()
                     self.selected_card = selected_card
-                    self._update_game_display(
-                        f"{current_player.name} played a Wild card – choose a color!")
+                    self._update_game_display(f"{current_player.name} played a Wild card – choose a color!")
                     return
                 elif play_result is not False:
                     color = selected_card.color.value.capitalize()
