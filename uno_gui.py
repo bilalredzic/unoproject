@@ -46,7 +46,7 @@ class UnoGUI:
         )
 
         self.submit_button = gui.elements.UIButton(
-            relative_rect=pg.Rect((300, 500), (200, 40)),
+            relative_rect=pg.Rect((300, 520), (200, 40)),
             text="Start Game",
             manager=self.ui_manager
         )
@@ -257,6 +257,10 @@ class UnoGUI:
             if event.type == gui.UI_BUTTON_PRESSED and event.ui_element == self.play_again_button:
                 self.confetti_list.clear()
                 self.confetti_active = False
+                self._screen.fill((40, 40, 40))
+                background = pg.image.load(f"images/Player_Icons/Uno_Background.jpg")
+                background = pg.transform.scale(background, (SCREEN_WIDTH, SCREEN_HEIGHT))
+                self._screen.blit(background, (0, 0))
 
                 self.play_again_button.hide()
 
