@@ -213,6 +213,8 @@ class UnoGUI:
         clock = pg.time.Clock()
         running = True
 
+        login_background = pg.image.load("images/Player_Icons/Uno_Background.jpg")
+        login_background = pg.transform.scale(login_background, (SCREEN_WIDTH, SCREEN_HEIGHT))
         while running:
             time_delta = clock.tick(30) / 1000.0
 
@@ -222,6 +224,7 @@ class UnoGUI:
                 self._handle_event(event)
 
             if self.state == "login":
+                self._screen.blit(login_background, (0, 0))
                 self.ui_manager.update(time_delta)
                 self.ui_manager.draw_ui(self._screen)
                 pg.display.flip()
