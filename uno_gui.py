@@ -22,7 +22,10 @@ class UnoGUI:
         pg.display.set_caption("UNO")
         self.ui_manager = gui.UIManager((SCREEN_WIDTH, SCREEN_HEIGHT), 'theme.json')
 
+        pg.mixer.music.load(f"woow_x.wav")
         self.state = "login"
+        self.pause_panel = None
+        self.continue_btn = None
         self.player_inputs = []
         self.player_count_dropdown = None
         self.name_input_panels = []
@@ -157,10 +160,41 @@ class UnoGUI:
             manager=self.ui_manager
         )
 
-    def show_blank_screen(self):
+    def show_pass_screen(self):
+        if self.game_over:
+            return
+
+        if self.pause_panel is not None:
+            self.pause_panel.kill()
+            self.pause_panel = None
+            self.continue_btn = None
+
+        self.state = "pause"
+
         self._screen.fill((40, 40, 40))
         pg.display.flip()
-        pg.time.delay(600)
+
+        # Build the new overlay
+        self.pause_panel = gui.elements.UIPanel(
+            pg.Rect((0, 0), (SCREEN_WIDTH, SCREEN_HEIGHT)),
+            5,
+            self.ui_manager,
+            object_id="#pause_panel"
+        )
+        gui.elements.UILabel(
+            pg.Rect((0, 200), (SCREEN_WIDTH, 60)),
+            "Pass the computer to the next player",
+            self.ui_manager,
+            container=self.pause_panel,
+            object_id="#pause_label"
+        )
+        self.continue_btn = gui.elements.UIButton(
+            pg.Rect((SCREEN_WIDTH // 2 - 75, 300), (150, 50)),
+            "Continue",
+            self.ui_manager,
+            container=self.pause_panel,
+            object_id="#continue_button"
+        )
 
     def load_card_images(self):
         color_options = ['red', 'blue', 'green', 'yellow', 'wild']
@@ -215,9 +249,9 @@ class UnoGUI:
 
         login_background = pg.image.load("images/Player_Icons/Uno_Background.jpg")
         login_background = pg.transform.scale(login_background, (SCREEN_WIDTH, SCREEN_HEIGHT))
+
         while running:
             time_delta = clock.tick(30) / 1000.0
-
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     running = False
@@ -230,17 +264,37 @@ class UnoGUI:
                 pg.display.flip()
                 continue
 
+            if self.state == "pause":
+                self.ui_manager.update(time_delta)
+                self.ui_manager.draw_ui(self._screen)
+                pg.display.flip()
+                continue
+
             if self.game_over and not self.win_screen_shown:
                 self._show_win_screen()
                 self.win_screen_shown = True
             if not self.game_over:
                 self.load_Player_Icons()
+
             self._update_display(time_delta)
 
         pg.quit()
 
     def _handle_event(self, event):
-        self.ui_manager.process_events(event)
+        if event.type < pg.USEREVENT:
+            self.ui_manager.process_events(event)
+        if self.state == "pause":
+            if event.type == gui.UI_BUTTON_PRESSED:
+                if self.pause_panel:
+                    self.pause_panel.kill()
+                    self.pause_panel = None
+                self.continue_btn = None
+                self.state = "game"
+            else:
+                return
+
+        if event.type >= pg.USEREVENT:
+            self.ui_manager.process_events(event)
 
         if self.state == "login":
             if event.type == gui.UI_DROP_DOWN_MENU_CHANGED and event.ui_element == self.player_count_dropdown:
@@ -261,12 +315,10 @@ class UnoGUI:
                 self.confetti_list.clear()
                 self.confetti_active = False
                 self._screen.fill((40, 40, 40))
-                background = pg.image.load(f"images/Player_Icons/Uno_Background.jpg")
+                background = pg.image.load("images/Player_Icons/Uno_Background.jpg")
                 background = pg.transform.scale(background, (SCREEN_WIDTH, SCREEN_HEIGHT))
                 self._screen.blit(background, (0, 0))
-
                 self.play_again_button.hide()
-
                 self._create_login_ui()
                 self.state = "login"
                 self.win_screen_shown = False
@@ -275,28 +327,25 @@ class UnoGUI:
         if event.type == pg.MOUSEBUTTONDOWN:
             mouse_position = pg.mouse.get_pos()
 
-            # prevent card clicks from registering under buttons
-            if self.left_scroll_btn.rect.collidepoint(mouse_position) or self.right_scroll_btn.rect.collidepoint(
-                    mouse_position):
+            if self.left_scroll_btn.rect.collidepoint(mouse_position) or \
+                    self.right_scroll_btn.rect.collidepoint(mouse_position):
                 return
 
             if self.draw_button.rect.collidepoint(mouse_position):
                 self._handle_draw_action()
+
             self._handle_mouse_click(mouse_position)
 
         if event.type == gui.UI_BUTTON_PRESSED:
             if event.ui_element == self.draw_button:
                 self._handle_draw_action()
 
-            # scroll handling
             elif event.ui_element == self.left_scroll_btn:
                 self.card_scroll_offset = max(0, self.card_scroll_offset - 460)
-                print(f"Scrolled left: {self.card_scroll_offset}")
             elif event.ui_element == self.right_scroll_btn:
                 hand = self.game.players[self.game.current_player_index].hand
                 max_scroll = max(0, len(hand) * (CARD_WIDTH // 2) - SCREEN_WIDTH + 80)
                 self.card_scroll_offset = min(max_scroll, self.card_scroll_offset + 460)
-                print(f"Scrolled right: {self.card_scroll_offset}")
 
         if event.type == gui.UI_DROP_DOWN_MENU_CHANGED and event.ui_element == self.color_dropdown:
             chosen_color = event.text.lower()
@@ -313,10 +362,12 @@ class UnoGUI:
             self._update_game_display(f"Color shifted to {chosen_color.upper()}!")
 
             if not (len(self.game.players) == 2 and is_draw_four):
-                self.show_blank_screen()
+                self.show_pass_screen()
 
             self._check_for_win()
-
+            if not self.game_over:
+                if not (len(self.game.players) == 2 and is_draw_four):
+                    self.show_pass_screen()
     def _handle_mouse_click(self, position):
         if self.game_over:
             return
@@ -357,9 +408,12 @@ class UnoGUI:
                     special_actions_excluding_wild = ["skip", "reverse", "draw two", "draw four"]
                     two_player_game = (len(self.game.players) == 2)
                     is_special_action = (value.lower() in special_actions_excluding_wild)
-
+                    self._check_for_win()
+                    if not self.game_over:
+                        if not (two_player_game and is_special_action):
+                            self.show_pass_screen()
                     if not (two_player_game and is_special_action):
-                        self.show_blank_screen()
+                        self.show_pass_screen()
 
         self._check_for_win()
 
@@ -368,14 +422,16 @@ class UnoGUI:
             return
 
         current_player = self.game.players[self.game.current_player_index]
+
         if len(self.game.deck) > 0:
             drawn_card = self.game.deck.pop()
             current_player.hand.append(drawn_card)
             self._update_game_display(f"{current_player.name} drew a card")
-            self.show_blank_screen()
             self.game.next_turn()
 
         self._check_for_win()
+        if not self.game_over:
+            self.show_pass_screen()
 
     def _check_for_win(self):
         for player in self.game.players:
