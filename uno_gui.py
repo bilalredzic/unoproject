@@ -21,6 +21,7 @@ class UnoGUI:
         pg.display.update()
         pg.display.set_caption("UNO")
         self.ui_manager = gui.UIManager((SCREEN_WIDTH, SCREEN_HEIGHT), 'theme.json')
+        pg.mixer.init()
 
         pg.mixer.music.load(f"woow_x.wav")
         self.state = "login"
@@ -37,6 +38,7 @@ class UnoGUI:
         self.game_over = False
         self.win_screen_shown = False
         self.confetti_list = []
+        self.card_count_labels = []
         self.confetti_active = False
         self._create_login_ui()
 
@@ -219,6 +221,10 @@ class UnoGUI:
             icon.kill()
         self.player_icons.clear()
 
+        for lbl in getattr(self, "card_count_labels", []):
+            lbl.kill()
+        self.card_count_labels.clear()
+
         if self.game.direction == 1:
             self.direction_right_icon.show()
             self.direction_left_icon.hide()
@@ -227,22 +233,33 @@ class UnoGUI:
             self.direction_right_icon.hide()
 
         x = 60
+        icon_w, icon_h = player_icon_height, player_icon_width
+
         for i, player in enumerate(self.game.players):
             is_active = (i == self.game.current_player_index)
-            icon_path = f"images/Player_Icons/Active Player Icon({i + 1}).png" if is_active \
-                else f"images/Player_Icons/Player Icon({i + 1}).png"
-
-            surface = pg.image.load(icon_path)
-            surface = pg.transform.scale(surface, (player_icon_height, player_icon_width))
-
-            icon = gui.elements.UIImage(
-                relative_rect=pg.Rect((x, 0), (player_icon_height, player_icon_width)),
-                image_surface=surface,
-                manager=self.ui_manager
+            icon_path = (
+                f"images/Player_Icons/Active Player Icon({i + 1}).png"
+                if is_active else
+                f"images/Player_Icons/Player Icon({i + 1}).png"
             )
-            self.player_icons.append(icon)
-            x += 40
 
+            surf = pg.transform.scale(pg.image.load(icon_path), (icon_w, icon_h))
+            img = gui.elements.UIImage(
+                relative_rect=pg.Rect((x, 0), (icon_w, icon_h)),
+                image_surface=surf,
+                manager=self.ui_manager,
+            )
+            self.player_icons.append(img)
+
+            card_lbl = gui.elements.UILabel(
+                relative_rect=pg.Rect((x, icon_h + 2), (icon_w, 18)),
+                text=str(len(player.hand)),
+                manager=self.ui_manager,
+                object_id="#card_count_label",
+            )
+            self.card_count_labels.append(card_lbl)
+
+            x += 40
     def run_game(self):
         clock = pg.time.Clock()
         running = True
