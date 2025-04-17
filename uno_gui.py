@@ -43,6 +43,9 @@ class UnoGUI:
         self._create_login_ui()
 
     def _create_login_ui(self):
+        for lbl in getattr(self, "card_count_labels", []):
+            lbl.kill()
+        self.card_count_labels.clear()
         self.player_count_dropdown = gui.elements.UIDropDownMenu(
             options_list=[str(i) for i in range(2, 11)],
             starting_option='2',
@@ -469,6 +472,8 @@ class UnoGUI:
         self.left_scroll_btn.hide()
         for icon in self.player_icons:
             icon.hide()
+        for lbl in self.card_count_labels:  # NEW
+            lbl.hide()
 
         self.play_again_button.show()
 
